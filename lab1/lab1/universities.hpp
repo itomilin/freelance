@@ -27,7 +27,7 @@ public:
 	void sortVectorByType(int sortType);
 
 private:
-	// Инициализируем вектор, типом которого является класс ВУЗ.
+	// РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РІРµРєС‚РѕСЂ, С‚РёРїРѕРј РєРѕС‚РѕСЂРѕРіРѕ СЏРІР»СЏРµС‚СЃСЏ РєР»Р°СЃСЃ Р’РЈР—.
 	std::vector<std::unique_ptr<University>> _universities;
 
 };

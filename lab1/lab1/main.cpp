@@ -54,9 +54,9 @@ int main(int argc, char **argv)
 			std::cout << "Invalid number!\n" << std::endl;
 		}
 
-		// Çàäåğæêà êîíñîëè.
+		// Ğ—Ğ°Ğ´ĞµÑ€Ğ¶ĞºĞ° ĞºĞ¾Ğ½ÑĞ¾Ğ»Ğ¸.
 		system("pause");
-		// Î÷èñòêà êîíñîëè.
+		// ĞÑ‡Ğ¸ÑÑ‚ĞºĞ° ĞºĞ¾Ğ½ÑĞ¾Ğ»Ğ¸.
 		system("cls");
 	}
 }
