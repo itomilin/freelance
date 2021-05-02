@@ -87,7 +87,7 @@ void Universities::showUniversities()
 */
 void Universities::writeToFile(const std::string &path)
 {
-	std::fstream file;
+	std::ofstream file;
 	// Открываем файл на запись
 	file.open(path, std::ios::out);
 
@@ -129,14 +129,15 @@ void Universities::readFromFile(const std::string &path)
 	std::string facultyCount = "";
 	std::string studentCount = "";
 
-	std::fstream file;
+	std::ifstream file;
 	// Открываем файл на чтение
 	file.open(path, std::ios::in | std::ios::binary);
 
 	if (file.is_open())
 	{
-		std::getline(file, line);
-		while (!file.eof())
+		file >> line;
+		// Читаем файл, пока он не дошел до конца.
+		while (file)
 		{
 			std::istringstream iss(line);
 			// Раскладываем прочитанную строку на поля.
@@ -154,8 +155,8 @@ void Universities::readFromFile(const std::string &path)
 			// Помещаем прочитанный объект в список.
 			_universities.emplace_back(std::make_unique<University>(university));
 
-			// Смещаем на следующую запись.
-			std::getline(file, line);
+			// Читаем следующую строку.
+			file >> line;
 		}
 
 		file.close();

@@ -4,7 +4,7 @@
 int main(int argc, char **argv)
 {
 	Universities universities;
-	static const std::string PATH_TO_FILE = ".\\output\\universities.txt";
+	static const std::string PATH_TO_FILE = ".\\output\\universities.csv";
 
 	while (true)
 	{

@@ -1,7 +1,6 @@
 #include "university.hpp"
 
 #include <chrono>
-#include <iomanip>
 
 /**
 * Конструктор с параметрами.
