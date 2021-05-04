@@ -6,115 +6,59 @@ TagParser::TagParser(QString data)
 {
 }
 
-QString TagParser::findAllH1()
+QString TagParser::parseHTML(QString openTag, QString closeTag)
 {
+    // Переменная в которую будем писать информацию о тегах.
     QString message = "";
-    auto openPosition = 0;
     int current = 0;
+    // Поскольку тегов может быть много, то заведем вектор, в котором будем
+    // хранить номера символов с которых начинается открывающий тег.
     std::vector<int> v;
+
+    // Находим все открывающие теги и помещаем их позиции в вектор.
     while (true)
     {
-        current = _data.indexOf(_tagH1Open, current);
+        current = _data.indexOf(openTag, current);
         if (current == -1)
             break;
         v.emplace_back(current);
-        openPosition = current;
-        current += _tagH1Open.length();
+        current += openTag.length();
     }
 
-    if (openPosition != -1)
-    {
-        std::cout << "Found open tag" << std::endl;
-    }
-    else
-    {
-        message += "Open tag not found!";
-    }
-
-    if (openPosition != -1)
+    // Начинаем разбирать элементы вектора.
+    for(auto const &item : v)
     {
         // Записываем позиция + длина тега, чтобы начать поиск с этой позиции в строке.
-        bool isCorrectCloseTag = false;
-        int currentPosition = openPosition + _tagH1Open.length();
+        int currentPosition = item + openTag.length();
         int startPosition = currentPosition;
+        // Начинаем поиск открывающей скобки
         while (true)
         {
-            auto t = _data[currentPosition];
-            if (_data[currentPosition] == '<')
+            if (_data[currentPosition] == '<' ||
+                _data.length() == currentPosition)
             {
-                if (_tagH1Close == _data.mid(currentPosition, _tagH1Close.length()))
+                // Если открывающая скобка найдена, проверяем тег который начинается с нее.
+                // Если тег совпадает с искомым, значит все верно.
+                if (closeTag == _data.mid(currentPosition, closeTag.length()))
                 {
-                    message = "Close and open tags is correct!\n";
-                    message += _tagH1Open;
+                    // Когда оба тега верны, формируем строку для файла.
+                    message += "Close and open tags is correct!\n";
+                    message += openTag;
                     message += _data.mid(startPosition, currentPosition - startPosition);
-                    message += _tagH1Close;
-                    isCorrectCloseTag = true;
+                    message += closeTag + "\n\n";
                 }
+                // Если иначе, то сообщаем об ошибке и указываем позицию строки
+                // открывающего тега, для которого неправильный закрывающий.
                 else
                 {
                     // Считаем количество переносов сначала до текущего символа.
                     // Чтобы узнать номер строки.
                     auto stringNumber = _data
-                            .left(currentPosition + _tagH1Close.length())
+                            .left(startPosition - 1)
                             .count('\n');
-                    message += "Close tag is incorrect!\nLine number is: " +
-                            QString::number(stringNumber);
-                }
-                break;
-            }
-            ++currentPosition;
-        }
-    }
-
-    return message;
-}
-
-// Метод для разбора тегов согласно варианту.
-QString TagParser::parseFile()
-{
-    QString message = "";
-    bool foundOpenTag = false;
-    // Ищем совпадение в тексте по строке открывающего тега.
-    // Если совпадение не найдено, возвращает -1
-    auto openPosition = _data.indexOf(_tagTitleOpen);
-
-    if (openPosition != -1)
-    {
-        std::cout << "Found open tag" << std::endl;
-    }
-    else
-    {
-        message += "Open tag not found!";
-    }
-
-    if (openPosition != -1)
-    {
-        // Записываем позиция + длина тега, чтобы начать поиск с этой позиции в строке.
-        bool isCorrectCloseTag = false;
-        int currentPosition = openPosition + _tagTitleOpen.length();
-        int startPosition = currentPosition;
-        while (true)
-        {
-            auto t = _data[currentPosition];
-            if (_data[currentPosition] == '<')
-            {
-                if (_tagTitleClose == _data.mid(currentPosition, _tagTitleClose.length()))
-                {
-                    message = "Close and open tags is correct!\n";
-                    message += _tagTitleOpen;
-                    message += _data.mid(startPosition, currentPosition - startPosition);
-                    message += _tagTitleClose;
-                    isCorrectCloseTag = true;
-                }
-                else
-                {
-                    // Считаем количество переносов сначала до текущего символа.
-                    // Чтобы узнать номер строки.
-                    auto stringNumber = _data
-                            .left(currentPosition + _tagTitleClose.length())
-                            .count('\n');
-                    message += "Close tag is incorrect!\nLine number is: " +
-                            QString::number(stringNumber);
+                    message += "Close tag " +
+                            closeTag +" is incorrect!\nOpen tag at line №: " +
+                            QString::number(++stringNumber) + "\n\n";
                 }
                 break;
             }

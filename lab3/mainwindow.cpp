@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QTextCodec>
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,7 +15,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    ui->plainTextEdit->clear();
     // Вызываем диалог выбора файла, путь записываем в filename.
     QString filename = QFileDialog::getOpenFileName(this, "Open the file");
     if (filename.isEmpty())
@@ -29,8 +26,6 @@ void MainWindow::on_actionOpen_triggered()
         return;
 
     // Читаем построчно файл и записываем его в строку для дальнейшего разбора.
-    QTextCodec *utfcodec = QTextCodec::codecForName("UTF-8");
-    utfcodec->setCodecForLocale(utfcodec);
     while (!file.atEnd())
     {
         QString line = file.readLine();
@@ -39,5 +34,38 @@ void MainWindow::on_actionOpen_triggered()
 
     // Создаем объект класса для парсинга текста. Используем умный указатель.
     std::shared_ptr<TagParser> tagParser = std::make_shared<TagParser>(_data);
-    ui->plainTextEdit->insertPlainText(tagParser->parseFile());
+    // Вызываем метод парсинга файла для тегов заданных по заданию.
+    ui->plainTextEdit->setPlainText(tagParser->parseHTML(_tagTitleOpen, _tagTitleClose));
+    ui->plainTextEdit->appendPlainText(tagParser->parseHTML(_tagH1Open, _tagH1Close));
+    ui->plainTextEdit->appendPlainText(tagParser->parseHTML(_tagH2Open, _tagH2Close));
+    // Очищаем загруженный контент.
+    _data.clear();
+    // Закрываем файл.
+    file.close();
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    // Вызываем диалог сохранения файла, путь записываем в filename.
+    QString filename = QFileDialog::getSaveFileName(this, "Save the file");
+    if (filename.isEmpty())
+        return;
+
+    // Открываем файл в режиме для записи.
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+    // Переменная для хранения контента, который нужно записать в файл.
+    QTextStream out(&file);
+    // Пишем содержимое plainText в файл.
+    out << ui->plainTextEdit->toPlainText() << "\n";
+    // Закрываем файл.
+    file.close();
+    // Чистим текстовое поле.
+    ui->plainTextEdit->clear();
+
+    // Вызываем message box после успешной записи.
+    QMessageBox msgBox;
+    msgBox.setText("Successfull created! to -> " + filename);
+    msgBox.exec();
 }
