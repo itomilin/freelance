@@ -12,7 +12,7 @@ public:
     ~Doctor();
     Doctor(std::string specialization,
            std::string initials,
-           size_t      _roomNumber);
+           size_t      roomNumber);
 
     std::string getInfo();
 
