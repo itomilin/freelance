@@ -42,6 +42,8 @@ private slots:
 
     void on_pushButtonDeleteDoctor_clicked();
 
+    void on_pushButtonDeletePatient_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -65,6 +67,10 @@ private:
 
     // Метод для добавления связей.
     void addLink();
+
+    void createDoctorRelation();
+
+    void createPatientRelation();
 
 // Методы, поля для работы с файлом.
 private:

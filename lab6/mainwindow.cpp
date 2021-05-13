@@ -29,12 +29,9 @@ void MainWindow::on_pushButtonAddDoctor_clicked()
     }
 
     // Создаем новый объект
-//    Doctor doctor(specialization, initials, roomNumber);
     Doctor *doctor = new Doctor(specialization, initials, roomNumber);
 
     // Кладем созданный объект в вектор.
-//    _doctors.emplace_back(std::make_unique<Doctor>(doctor));
-//    _qDoctors.emplaceBack(doctor);
     _qDoctors.push_back(doctor);
 
     QStringList *lines = new QStringList();
@@ -67,7 +64,6 @@ void MainWindow::on_pushButtonAddPatient_clicked()
     Patient *patient = new Patient(gender, initials, age);
 
     // Кладем созданный объект в вектор.
-//    _qPatients.emplaceBack(patient);
     _qPatients.push_back(patient);
 
     QStringList *lines = new QStringList();
@@ -77,7 +73,6 @@ void MainWindow::on_pushButtonAddPatient_clicked()
     for(auto const &patient : _qPatients)
     {
         lines->append(QString::fromStdString(patient->getInfo()));
-//        ui->listWidgetPatients->addItem(QString::fromStdString(patient->getInfo()));
     }
     model->setStringList(*lines);
     ui->listViewPatients->setModel(model);
@@ -121,10 +116,14 @@ void MainWindow::addLink()
         _doctorRelation.insert(std::make_pair(_qDoctors.at(item.first),
                                               _qPatients.at(item.second)));
     }
-    //
 
+    createDoctorRelation();
+    createPatientRelation();
+}
 
-    // -------------------------------------------------------------------------
+void MainWindow::createDoctorRelation()
+{
+
     // Создаем дерево отношений для докторов.
 
     // Создаем базовый topLevelItem для построения дерева отношений.
@@ -158,7 +157,7 @@ void MainWindow::addLink()
         // таким образом формируется дерево отношений
         QTreeWidgetItem *patient = new QTreeWidgetItem();
         // В первую колонку вставляем пустую строку.
-        patient->setText(0, {});
+        patient->setText(0, "");
         // Во вторую информацию о пациете.
         patient->setText(1, p->getInfo().c_str());
         // Привязываем пациента к доктору.
@@ -167,6 +166,10 @@ void MainWindow::addLink()
         prevD = d;
     }
 
+}
+
+void MainWindow::createPatientRelation()
+{
     // -------------------------------------------------------------------------
     // Создаем обратное дерево отношений для пациентов.
 
@@ -197,7 +200,7 @@ void MainWindow::addLink()
         // таким образом формируется дерево отношений
         QTreeWidgetItem *doctor = new QTreeWidgetItem();
         // В первую колонку вставляем пустую строку.
-        doctor->setText(0, {});
+        doctor->setText(0, "");
         // Во вторую информацию о докторе.
         doctor->setText(1, d->getInfo().c_str());
         // Привязываем докторов к пациентам.
@@ -207,6 +210,7 @@ void MainWindow::addLink()
     }
 }
 
+// Обработчик добавления отношений.
 void MainWindow::on_pushButtonCreateDoctorRelation_clicked()
 {
     addLink();
@@ -215,6 +219,7 @@ void MainWindow::on_pushButtonCreateDoctorRelation_clicked()
     ui->listViewPatients->clearSelection();
 }
 
+// Метод сохранения контента в файл.
 int MainWindow::saveContent(const QString &path)
 {
     // Проверка на пустоту списков.
@@ -259,6 +264,7 @@ int MainWindow::saveContent(const QString &path)
     return EXIT_SUCCESS;
 }
 
+// Метод загрузки из файла.
 int MainWindow::loadContent(const QString &path)
 {
     std::ifstream file;
@@ -346,6 +352,7 @@ int MainWindow::loadContent(const QString &path)
     return EXIT_SUCCESS;
 }
 
+// Обработчик кнопки сохранения.
 void MainWindow::on_actionSave_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this,
@@ -360,6 +367,7 @@ void MainWindow::on_actionSave_triggered()
 
 }
 
+// Обработчик кнопки загрузки файла
 void MainWindow::on_actionOpen_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this,
@@ -403,95 +411,22 @@ void MainWindow::on_actionOpen_triggered()
     model->setStringList(*lines);
     ui->listViewPatients->setModel(model);
 
-    // Создаем базовый topLevelItem для построения дерева отношений.
-    QTreeWidgetItem *doctor = new QTreeWidgetItem(ui->treeWidgetDoctors);
-    // Присвоим на предыдущий элемент начало контейнера set через итератор.
-    Doctor *prevD = _doctorRelation.begin()->first;
     if (!_doctorIndexesRelation.empty())
     {
         /** На основе сохраненных индексов, берем значения по индексам и создаем пары отношений.
-         *  Необходимо для сохранения связей в файл.
+         *  Необходимо для сохранения/чтения связей.
          */
         for (auto const &item : _doctorIndexesRelation)
         {
             _doctorRelation.insert(std::make_pair(_qDoctors.at(item.first),
                                                   _qPatients.at(item.second)));
         }
-        //
-        // Перебираем все связи  доктор -> пациенты
-        for(auto const &relation : _doctorRelation)
-        {
-            // Записываем следующее в списке имя доктора и пациента.
-            // Извлекаем значения из контейнера pair first - доктор, second - пациент
-            auto d = relation.first;
-            auto p = relation.second;
-
-            // Для будущего формирования дерева, заполняем список.
-            // Формируем множество для отношения пациент -> доктора
-            _patientRelation.insert(std::make_pair(p, d));
-
-            // Когда сменяется доктор, то создаем новый topLevelItem
-            // Для этого проверяем на равенство предыдущий и текущий элемент списка
-            if (d != prevD)
-            {
-                doctor = new QTreeWidgetItem(ui->treeWidgetDoctors);
-            }
-            // добавляем в topLevelItem информацию о докторе
-            doctor->setText(0, d->getInfo().c_str());
-            ui->treeWidgetDoctors->addTopLevelItem(doctor);
-
-            // Создаем объект child для пациента и добавляем его в topLevelItem
-            // таким образом формируется дерево отношений
-            QTreeWidgetItem *patient = new QTreeWidgetItem();
-            // В первую колонку вставляем пустую строку.
-            patient->setText(0, {});
-            // Во вторую информацию о пациете.
-            patient->setText(1, p->getInfo().c_str());
-            // Привязываем пациента к доктору.
-            doctor->addChild(patient);
-
-            prevD = d;
-        }
-
-        // Создаем базовый topLevelItem
-        QTreeWidgetItem *patient = new QTreeWidgetItem(ui->treeWidgetPatients);
-
-        // Присвоим на предыдущий элемент начало контейнера set через итератор.
-        Patient *prevP = _doctorRelation.begin()->second;
-
-        // Перебираем все связи  доктор -> пациенты
-        for(auto const &relation : _patientRelation)
-        {
-            // Записываем следующее в списке имя доктора и пациента.
-            auto p = relation.first;
-            auto d = relation.second;
-
-            // Когда сменяется доктор, то создаем новый topLevelItem
-            // Для этого проверяем на равенство предыдущий и текущий элемент списка
-            if (p != prevP)
-            {
-                patient = new QTreeWidgetItem(ui->treeWidgetPatients);
-            }
-            // добавляем в topLevelItem информацию о пациенте.
-            patient->setText(0, p->getInfo().c_str());
-            ui->treeWidgetDoctors->addTopLevelItem(patient);
-
-            // Создаем объект child для доктора и добавляем его в topLevelItem
-            // таким образом формируется дерево отношений
-            QTreeWidgetItem *doctor = new QTreeWidgetItem();
-            // В первую колонку вставляем пустую строку.
-            doctor->setText(0, {});
-            // Во вторую информацию о докторе.
-            doctor->setText(1, d->getInfo().c_str());
-            // Привязываем докторов к пациентам.
-            patient->addChild(doctor);
-
-            prevP = p;
-        }
-
+        createDoctorRelation();
     }
+    createPatientRelation();
 }
 
+// Обработчик удаления докторов.
 void MainWindow::on_pushButtonDeleteDoctor_clicked()
 {
     // Проверяем на наличие модели если указатеь на nullptr, значит список пуст.
@@ -506,23 +441,43 @@ void MainWindow::on_pushButtonDeleteDoctor_clicked()
     int doctorIndex = selectedDoctorIndex.first().row();
 
     // Удаляем сначала из списка докторов.
-    _qDoctors.removeAt(doctorIndex);
-    for (auto const &item : _doctorIndexesRelation)
-    {
-        if (item.first == doctorIndex)
-        {
-            _doctorIndexesRelation.erase(item);
-        }
-    }
-
-
+    _qDoctors.erase(_qDoctors.begin() + doctorIndex);
 
     modelDoctors->model()->removeRow(doctorIndex);
-//    _qDoctors.removeAt(doctorIndex);
+    _doctorRelation.clear();
+    _patientRelation.clear();
+    ui->treeWidgetDoctors->clear();
+    ui->treeWidgetPatients->clear();
+    // Clear old data
+    _doctorIndexesRelation.clear();
+}
 
+// Обработчик удаления пациентов.
+void MainWindow::on_pushButtonDeletePatient_clicked()
+{
+    // Проверяем на наличие модели если указатеь на nullptr, значит список пуст.
+    auto modelPatients = ui->listViewPatients->selectionModel();
+    if (modelPatients == nullptr)
+    {
+        qDebug() << "[ ERROR ] tree view is empty!";
+        return;
+    }
 
-    qDebug() << "1";
-    // Затем из множества связей.
-//    _doctorIndexesRelation.find(std::make_pair<doctorIndex, 0>);
-//    _doctorIndexesRelation.insert(std::make_pair(doctorIndex, patientIndex));
+    // Удаление только по первому выделеному индексу
+    auto selectedPatientIndex = modelPatients->selectedIndexes();
+    int patientIndex = selectedPatientIndex.first().row();
+
+    // Удаляем сначала из списка пациентов.
+    _qPatients.erase(_qPatients.begin() + patientIndex);
+
+    // Очищаем модель
+    modelPatients->model()->removeRow(patientIndex);
+    // Очищаем связи
+    _doctorRelation.clear();
+    _patientRelation.clear();
+    // Очищаем контролы
+    ui->treeWidgetDoctors->clear();
+    ui->treeWidgetPatients->clear();
+    // Clear old data
+    _doctorIndexesRelation.clear();
 }
