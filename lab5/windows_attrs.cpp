@@ -10,10 +10,6 @@ WindowsAttrs::WindowsAttrs()
  */
 QStringList WindowsAttrs::parseFiles(const QDir &dir)
 {
-    // Задаем пороговое значение из задания, 1 megabytes
-    const int THRESHOLD_TASK = 1024 * 1024;
-    // Задаем маску для определения .jpg файлов
-    const QString MASK_FILTER = ".jpg";
     // Помещаем в список элементы для будущего отображения.
     QStringList filesWithAttrs;
     // Берем полный путь для дополнения.
@@ -21,21 +17,18 @@ QStringList WindowsAttrs::parseFiles(const QDir &dir)
     // Формируем строку для вывода, похожим образом, как в команде attrs
     QString itemString = "";
 
-    QStringList allDirFiles = dir.entryList(QStringList(), QDir::Hidden | QDir::Files);
+    QStringList allDirFiles = dir.entryList(QStringList(), QDir::Hidden | QDir::AllEntries | QDir::NoDotAndDotDot);
 
     // Перебираем все элементы для выбранной директории.
     for(const auto &item : allDirFiles)
     {
         QString pathToFile = absolutePath + "/" + item;
-
-        // Если файл с расширением .jpg и размер больше 1 mb
-        if (item.contains(MASK_FILTER) &&
-            (QFileInfo(pathToFile).size() > THRESHOLD_TASK))
-        {
-            itemString += "&";
-        }
         // Пишем в переменную атрибуты по переданному пути.
         DWORD d = GetFileAttributesA((LPCSTR)pathToFile.toStdString().c_str());
+
+        // If directory
+        if (d & FILE_ATTRIBUTE_DIRECTORY)
+            itemString += "<DIR>";
 
         // У одного файла может быть несколько атрибутов, в win api атрибуты
         // заданы по битовой маске, поэтому используем побитовый оператор &
@@ -47,8 +40,11 @@ QStringList WindowsAttrs::parseFiles(const QDir &dir)
             itemString += "H";
         if (d & FILE_ATTRIBUTE_READONLY)
             itemString += "R";
+
+
+
         itemString += "\t\t" + pathToFile;
-        // Разворачиваем слеши, чтобы путь вглядил как в Windows
+        // Разворачиваем слеши, чтобы путь как в Windows
         itemString.replace('/', '\\');
         filesWithAttrs.emplaceBack(itemString);
         // Чистим строку перед новой записью.

@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QVector>
 
-#include "tagparser.hpp"
+#include "add_symbol.hpp"
 
 #include <memory>
 #include <iostream>
@@ -29,18 +30,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    // Поле для хранения контента прочтенного файла.
-    QString _data { "" };
 
-    // Открывающий и закрывающий теги для сравнения.
-    const QString _tagTitleOpen { "<title>" };
-    const QString _tagTitleClose { "</title>" };
-
-    const QString _tagH1Open { "<h1>" };
-    const QString _tagH1Close { "</h1>" };
-
-    const QString _tagH2Open { "<h2>" };
-    const QString _tagH2Close { "</h2>" };
+    const QChar SYMBOL { '!' };
 
 };
 

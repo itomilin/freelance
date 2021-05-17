@@ -25,22 +25,27 @@ void MainWindow::on_actionOpen_triggered()
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
+    QString data = "";
     // Читаем построчно файл и записываем его в строку для дальнейшего разбора.
     while (!file.atEnd())
     {
         QString line = file.readLine();
-        _data.append(line);
-    }
 
-    // Создаем объект класса для парсинга текста. Используем умный указатель.
-    std::shared_ptr<TagParser> tagParser = std::make_shared<TagParser>(_data);
-    // Вызываем метод парсинга файла для тегов заданных по заданию.
-    ui->plainTextEdit->setPlainText(tagParser->parseHTML(_tagTitleOpen, _tagTitleClose));
-    ui->plainTextEdit->appendPlainText(tagParser->parseHTML(_tagH1Open, _tagH1Close));
-    ui->plainTextEdit->appendPlainText(tagParser->parseHTML(_tagH2Open, _tagH2Close));
-    // Очищаем загруженный контент.
-    _data.clear();
-    // Закрываем файл.
+        if (line.size() == 1 && line.endsWith('\n'))
+        {
+            data.append('\n');
+        }
+        else
+        {
+            // if end
+            if (line.endsWith('\n'))
+                line.replace('\n', SYMBOL).append('\n');
+            else
+                line.append(SYMBOL);
+            data.append(line);
+        }
+    }
+    ui->plainTextEdit->setPlainText(data);
     file.close();
 }
 

@@ -26,12 +26,10 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
-    tagparser.cpp
+        mainwindow.cpp
 
 HEADERS += \
-        mainwindow.h \
-    tagparser.hpp
+        mainwindow.h
 
 FORMS += \
         mainwindow.ui

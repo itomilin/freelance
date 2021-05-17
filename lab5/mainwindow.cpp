@@ -79,10 +79,4 @@ void MainWindow::parseDir(const QString &path)
 
     // Добавим полученный список в контрол.
     ui->listWidget->addItems(attrs->parseFiles(dir));
-    // Дополнительно подсветим красным, файлы jpg больше 1 мб
-    for (int i = 0; i < ui->listWidget->count(); ++i)
-    {
-        if (ui->listWidget->item(i)->text()[0] == '&')
-            ui->listWidget->item(i)->setForeground(Qt::red);
-    }
 }
