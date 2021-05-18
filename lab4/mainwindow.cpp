@@ -1,9 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 }
@@ -28,91 +28,49 @@ void MainWindow::myMessage(const QString &msg, const QString &title)
     msgBox.exec();
 }
 
-/**
- * Обработчик загрузки файла, который сохранен в бинарном формате.
- */
-void MainWindow::on_actionOpenBinary_triggered()
+void MainWindow::on_actionSIMPLE_triggered()
 {
-    // Вызываем метод чтения файла, передаем ему путь до файла.
-    // В зависимости от возвращаемого значения выполняем действие
-    if (readFromFile(BINARY) == 0)
-    {
-//        clearControls();
+    _data.clear();
+    // Вызываем диалог выбора файла, путь записываем в filename.
+    QString filename = QFileDialog::getOpenFileName(this, "Open the file");
+    if (filename.isEmpty())
+        return;
 
-        // Вызываем сообщение, что все ок.
-        myMessage("Binary file successfully read!", "OK");
-    }
-    else
+    // Открываем файл в режиме только для чтения.
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    // Читаем построчно файл и записываем его в строку для дальнейшего разбора.
+    while (!file.atEnd())
     {
-        myMessage("File could not read!", "ERROR");
+        QString line = file.readLine();
+
+        if (line.size() == 1 && line.endsWith('\n'))
+        {
+            _data.append('\n');
+        }
+        else
+        {
+            // if end
+            if (line.endsWith('\n'))
+                line.replace('\n', SYMBOL).append('\n');
+            else
+                line.append(SYMBOL);
+            _data.append(line);
+        }
     }
+    ui->plainTextEdit->setPlainText(_data);
+    file.close();
 }
-
-/**
- * Обработчик сохранения файла на диск в бинарном формате.
- */
-void MainWindow::on_actionSaveBinary_triggered()
-{
-    // Вызываем метод чтения файла, передаем ему путь до файла.
-    // В зависимости от возвращаемого значения выполняем действие
-    if (writeToFile(BINARY) == 0)
-    {
-//        clearControls();
-        // Вызываем сообщение, что все ок.
-        myMessage("File successfully recorded", "OK");
-    }
-    else
-    {
-        myMessage("File could not record!", "ERROR");
-    }
-}
-
-/**
- * Обработчик загрузки файла в CSV формате
- */
-void MainWindow::on_actionOpenCSV_triggered()
-{
-    // Вызываем метод чтения файла, передаем ему путь до файла.
-    // В зависимости от возвращаемого значения выполняем действие
-    if (readFromFile(CSV) == 0)
-    {
-
-        // Вызываем сообщение, что все ок.
-        myMessage("File successfully read!", "OK");
-    }
-    else
-    {
-        myMessage("File could not read!", "ERROR");
-    }
-}
-
-/**
- * Обработчик сохранения файла на диск в CSV
- */
-void MainWindow::on_actionSaveCSV_triggered()
-{
-    // Вызываем метод чтения файла, передаем ему путь до файла.
-    // В зависимости от возвращаемого значения выполняем действие
-    if (writeToFile(CSV) == 0)
-    {
-//        clearControls();
-        // Вызываем сообщение, что все ок.
-        myMessage("File successfully recorded", "OK");
-    }
-    else
-    {
-        myMessage("File could not record!", "ERROR");
-    }
-}
-
 
 // Ниже заведем два метода, для уменьшения дублирования кода
 // Передаем аргумент для выбора записи в бинарный или csv формат
-int MainWindow::writeToFile(const FileTypes &type)
+int MainWindow::writeToFile(const FileType& type)
 {
     QString filename = "";
     // В зависимости от типа, вызываем конструктор с разными фильтрами по маске.
-    if (type == BINARY)
+    if (type == FileType::BINARY)
     {
         filename = QFileDialog::getSaveFileName(this,
                                                 "Save the file",
@@ -130,19 +88,20 @@ int MainWindow::writeToFile(const FileTypes &type)
     // Проверяем задано ли имя.
     if (filename.isEmpty())
         return EXIT_FAILURE;
+
+    ui->plainTextEdit->clear();
 
     // Выбираем метод для записи в зависимости от типа
-//    return type == BINARY ?
-//                _universities.writeToFileBinary(filename.toStdString()) :
-//                _universities.writeToFile(filename.toStdString());
-    return 0;
+    return type == BINARY ?
+                _fileWorker->writeToFileBinary(filename.toStdString(), _data.toStdString()) :
+                _fileWorker->writeToFile(filename.toStdString(), _data.toStdString());
 }
 
-int MainWindow::readFromFile(const FileTypes &type)
+int MainWindow::readFromFile(const FileType& type)
 {
     QString filename = "";
     // В зависимости от типа, вызываем конструктор с разными фильтрами по маске.
-    if (type == BINARY)
+    if (type == FileType::BINARY)
     {
         filename = QFileDialog::getOpenFileName(this,
                                                 "Open the file",
@@ -161,11 +120,68 @@ int MainWindow::readFromFile(const FileTypes &type)
     if (filename.isEmpty())
         return EXIT_FAILURE;
 
+    _data.clear();
     // Выбираем метод для чтения в зависимости от типа
-//    return type == BINARY ?
-//                _universities.readFromFileBinary(filename.toStdString()) :
-//                _universities.readFromFile(filename.toStdString());
-    return 0;
+    return type == BINARY ?
+                _fileWorker->readFromFileBinary(filename, _data) :
+                _fileWorker->readFromFile(filename.toStdString(), _data);
+}
 
+void MainWindow::on_openCSV_triggered()
+{
+    if (readFromFile(FileType::CSV) == 0)
+    {
+        ui->plainTextEdit->setPlainText(_data);
+        // Вызываем сообщение, что все ок.
+        myMessage("File successfully read", "OK");
+    }
+    else
+    {
+        myMessage("File could not read!", "ERROR");
+    }
+}
+
+void MainWindow::on_saveCSV_triggered()
+{
+    if (writeToFile(FileType::CSV) == 0)
+    {
+        // Вызываем сообщение, что все ок.
+        myMessage("File successfully recorded", "OK");
+    }
+    else
+    {
+        myMessage("File could not record!", "ERROR");
+    }
+}
+
+// -----------------------------------------------------
+
+// save binary
+void MainWindow::on_saveBINARY_triggered()
+{
+    if (writeToFile(FileType::BINARY) == 0)
+    {
+        // Вызываем сообщение, что все ок.
+        myMessage("File successfully recorded", "OK");
+    }
+    else
+    {
+        myMessage("File could not record!", "ERROR");
+    }
+}
+
+//  read binary
+void MainWindow::on_openBINARY_triggered()
+{
+    if (readFromFile(FileType::BINARY) == 0)
+    {
+        ui->plainTextEdit->setPlainText(_data);
+        // Вызываем сообщение, что все ок.
+        myMessage("File successfully read", "OK");
+    }
+    else
+    {
+        myMessage("File could not read!", "ERROR");
+    }
 }
 

@@ -1,0 +1,37 @@
+[2021.05.17 19:43:26] Primary screen DPI: 96
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAOpenSansRegular.ttf' loaded 'DAOpenSansRegular'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAVazirRegular.ttf' loaded 'DAVazirRegular'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAOpenSansRegularItalic.ttf' loaded 'DAOpenSansRegularItalic'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAVazirRegular.ttf' loaded 'DAVazirRegular'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAOpenSansSemiboldAsBold.ttf' loaded 'DAOpenSansSemibold'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAVazirMediumAsBold.ttf' loaded 'DAVazirMedium'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAOpenSansSemiboldItalicAsBold.ttf' loaded 'DAOpenSansSemiboldItalic'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAVazirMediumAsBold.ttf' loaded 'DAVazirMedium'
+[2021.05.17 19:43:26] Font: from ':/gui/fonts/DAOpenSansSemiboldAsBold.ttf' loaded 'DAOpenSansSemibold'
+[2021.05.17 19:43:27] Font: from ':/gui/fonts/DAVazirMediumAsBold.ttf' loaded 'DAVazirMedium'
+[2021.05.17 19:43:27] Font: from ':/gui/fonts/DAOpenSansSemiboldItalicAsBold.ttf' loaded 'DAOpenSansSemiboldItalic'
+[2021.05.17 19:43:27] Font: from ':/gui/fonts/DAVazirMediumAsBold.ttf' loaded 'DAVazirMedium'
+[2021.05.17 19:43:27] App Info: reading settings...
+[2021.05.17 19:43:27] App Info: reading encrypted settings...
+[2021.05.17 19:43:27] Lang Info: Loaded cached, keys: 3112
+[2021.05.17 19:43:27] OpenAL Logging Level: (not set)
+[2021.05.17 19:43:27] Audio Playback Devices: OpenAL Soft on Speakers (High Definition Audio Device)
+[2021.05.17 19:43:27] Audio Playback Default Device: OpenAL Soft on Speakers (High Definition Audio Device)
+[2021.05.17 19:43:27] Audio Capture Devices: OpenAL Soft on Microphone (High Definition Audio Device)
+[2021.05.17 19:43:27] Audio Capture Default Device: OpenAL Soft on Microphone (High Definition Audio Device)
+[2021.05.17 19:43:27] App Info: reading accounts info...
+[2021.05.17 19:43:27] App Info: reading encrypted info...
+[2021.05.17 19:43:27] App Info: reading map...
+[2021.05.17 19:43:27] App Info: reading encrypted map...
+[2021.05.17 19:43:27] App Info: reading encrypted user settings...
+[2021.05.17 19:43:27] App Info: encrypted user settings read.
+[2021.05.17 19:43:27] App Info: reading encrypted mtp data...
+[2021.05.17 19:43:27] MTP Info: read keys, current: 1, to destroy: 0
+[2021.05.17 19:43:27] Map read time: 2
+[2021.05.17 19:43:27] App Info: reading encrypted mtp config...
+[2021.05.17 19:43:27] Export Info: Destroy top bar by controller removal.
+
+
+[2021.05.17 19:43:27] Lang Info: Loaded cached, keys: 3112
+[2021.05.17 19:43:27] Map read time: 2
+end
