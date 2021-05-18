@@ -6,8 +6,6 @@
 #include <QMessageBox>
 #include <QVector>
 
-#include "add_symbol.hpp"
-
 #include <memory>
 #include <iostream>
 

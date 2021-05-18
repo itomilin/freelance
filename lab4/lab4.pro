@@ -10,17 +10,10 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp \
-    university.cpp \
-    universities.cpp \
-    linked_list.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    mainwindow.h \
-    university.hpp \
-    universities.hpp \
-    linked_list.hpp \
-    node.hpp
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui
