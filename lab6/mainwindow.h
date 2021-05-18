@@ -8,8 +8,8 @@
 #include <QStringListModel>
 #include <QFileDialog>
 
-#include "doctor.hpp"
-#include "patient.hpp"
+#include "department.hpp"
+#include "medicines.hpp"
 
 #include <memory>
 #include <set>
@@ -30,47 +30,48 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButtonAddDoctor_clicked();
-
-    void on_pushButtonAddPatient_clicked();
-
-    void on_pushButtonCreateDoctorRelation_clicked();
 
     void on_actionSave_triggered();
 
     void on_actionOpen_triggered();
 
-    void on_pushButtonDeleteDoctor_clicked();
+    void on_pushButtonDeleteDepartment_clicked();
 
-    void on_pushButtonDeletePatient_clicked();
+    void on_pushButtonAddDepartment_clicked();
+
+    void on_pushButtonDeleteMedication_clicked();
+
+    void on_pushButtonAddMedication_clicked();
+
+    void on_actioncreate_triggered();
 
 private:
     Ui::MainWindow *ui;
 
     // вектор, куда будем складывать сущности докторов.
-    QVector<Doctor*> _qDoctors;
+    QVector<Department*> _qDepartments;
 //    std::vector<std::unique_ptr<Doctor>> _doctors;
 
     // вектор, куда будем складывать сущности пациентов.
-    QVector<Patient*> _qPatients;
+    QVector<Medicines*> _qMedicines;
 //    std::vector<std::unique_ptr<Patient>> _patients;
 
     // Множество для хранения пар. Используем именно этот контейнер, т.к
     // для задуманного алгоритма построения связей, необходима сортировка по первому
     // параметру - докторам.
     // Для формирования пары отношения, используется контейнер pair
-    std::set<std::pair<Doctor*, Patient*>> _doctorRelation;
-    std::set<std::pair<int, int>> _doctorIndexesRelation;
+    std::set<std::pair<Department*, Medicines*>> _departmentRelation;
+    std::set<std::pair<int, int>> _departmentIndexesRelation;
 
     // Аналогично для пациентов, необходима сортировка по первому параметру - пациентам.
-    std::set<std::pair<Patient*, Doctor*>> _patientRelation;
+    std::set<std::pair<Medicines*, Department*>> _medicinesRelation;
 
     // Метод для добавления связей.
     void addLink();
 
-    void createDoctorRelation();
+    void createDepartmentRelation();
 
-    void createPatientRelation();
+    void createMedicinesRelation();
 
 // Методы, поля для работы с файлом.
 private:
@@ -78,9 +79,9 @@ private:
 
     int loadContent(const QString &path);
     // Название секции, в которй будем размещать список докторов.
-    const std::string DOCTOR_SECTION = "[doctors]";
+    const std::string DEPARTMENT_SECTION = "[department]";
     // Название секции, в которй будем размещать список пациентов.
-    const std::string PATIENT_SECTION = "[patients]";
+    const std::string MEDICINES_SECTION = "[medicines]";
     // Название секции, в которй будем размещать список связей.
     const std::string RELATIONS_SECTION = "[relations]";
 };

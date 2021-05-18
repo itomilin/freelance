@@ -14,125 +14,136 @@ MainWindow::~MainWindow()
 }
 
 // Обработчик кнопки добавления доктора.
-void MainWindow::on_pushButtonAddDoctor_clicked()
+void MainWindow::on_pushButtonAddDepartment_clicked()
 {
     // Получаем значения с контролов.
-    std::string specialization = ui->lineEditSpecialization->text().toStdString();
-    std::string initials = ui->lineEditInitialsDoctor->text().toStdString();
-    size_t roomNumber = ui->spinBoxRoomNumber->value();
+    std::string departmentName = ui->lineEditDepartmentName->text().toStdString();
+    size_t staffCount = ui->spinBoxStaffCount->value();
 
     // Если поля пустые, тогда не выполняем код ниже.
-    if (specialization.empty() ||
-        initials.empty())
-    {
+    if (departmentName.empty())
         return;
+
+    for (const auto& item : _qDepartments)
+    {
+        if (item->getName() == departmentName)
+        {
+            qDebug() << QString::fromStdString(departmentName) << " already exist";
+            return;
+        }
     }
 
     // Создаем новый объект
-    Doctor *doctor = new Doctor(specialization, initials, roomNumber);
+    Department *department = new Department(departmentName, staffCount);
 
     // Кладем созданный объект в вектор.
-    _qDoctors.push_back(doctor);
+    _qDepartments.push_back(department );
 
     QStringList *lines = new QStringList();
     QStringListModel *model = new QStringListModel(*lines, nullptr);
     // Заполняем контрол.
-    for(auto const &doctor : _qDoctors)
+    for(auto const &department : _qDepartments)
     {
-        lines->append(QString::fromStdString(doctor->getInfo()));
+        lines->append(QString::fromStdString(department->getInfo()));
     }
     model->setStringList(*lines);
-    ui->listViewDoctors->setModel(model);
+    ui->listViewDepartment->setModel(model);
 }
 
-// Обработчик кнопки добавления пациентов.
-void MainWindow::on_pushButtonAddPatient_clicked()
+// Обработчик кнопки добавления препаратов.
+void MainWindow::on_pushButtonAddMedication_clicked()
 {
     // Получаем значения с контролов.
-    std::string gender = ui->lineEditGender->text().toStdString();
-    std::string initials = ui->lineEditInitialsPatient->text().toStdString();
-    size_t age = ui->spinBoxAge->value();
+    std::string medicinesName = ui->lineEditMedicationName->text().toStdString();
+    double price = ui->doubleSpinBoxPrice->value();
+    size_t age = ui->spinBoxStaffCount->value();
 
     // Если поля пустые, завершаем выполнение.
-    if (gender.empty() ||
-        initials.empty())
-    {
+    if (medicinesName.empty())
         return;
+
+    for (const auto& item : _qMedicines)
+    {
+        if (item->getName() == medicinesName)
+        {
+            qDebug() << QString::fromStdString(medicinesName) << " already exist";
+            return;
+        }
     }
 
     // Создаем новый объект
-    Patient *patient = new Patient(gender, initials, age);
+    Medicines *medicines = new Medicines(medicinesName, price, age);
 
     // Кладем созданный объект в вектор.
-    _qPatients.push_back(patient);
+    _qMedicines.push_back(medicines);
 
     QStringList *lines = new QStringList();
     QStringListModel *model = new QStringListModel(*lines, nullptr);
 
     // Заполняем контрол.
-    for(auto const &patient : _qPatients)
+    for(auto const &item : _qMedicines)
     {
-        lines->append(QString::fromStdString(patient->getInfo()));
+        lines->append(QString::fromStdString(item->getInfo()));
     }
     model->setStringList(*lines);
-    ui->listViewPatients->setModel(model);
+    ui->listViewMedication->setModel(model);
 }
 
 void MainWindow::addLink()
 {
     // Проверяем на наличие модели если указатеь на nullptr, значит список пуст.
-    auto model = ui->listViewPatients->selectionModel();
-    auto modelDoctors = ui->listViewDoctors->selectionModel();
-    if (model == nullptr || modelDoctors == nullptr)
+    auto model = ui->listViewMedication->selectionModel();
+    auto modelDepartment = ui->listViewDepartment->selectionModel();
+    if (model == nullptr || modelDepartment == nullptr)
     {
         qDebug() << "[ ERROR ] tree view is empty!";
         return;
     }
 
     auto selectedPatientsIndexes = model->selectedIndexes();
-    auto selectedDoctorIndex = modelDoctors->selectedIndexes();
+    auto selectedDepartmentIndex = modelDepartment->selectedIndexes();
     // Проверяем выбраны ли элементы из списков.
-    if (selectedPatientsIndexes.empty() || selectedDoctorIndex.empty())
+    if (selectedPatientsIndexes.empty() || selectedDepartmentIndex.empty())
     {
         return;
     }
     // Обязательно очистить дерево связей.
-    ui->treeWidgetDoctors->clear();
-    ui->treeWidgetPatients->clear();
+    ui->treeWidgetDepartment->clear();
+    ui->treeWidgetMedication->clear();
 
     // Если не пуст, то перебираем строки которые были выбраны.
     for(auto const &item : selectedPatientsIndexes)
     {
         int patientIndex = item.row();
-        int doctorIndex = selectedDoctorIndex.first().row();
-        _doctorIndexesRelation.insert(std::make_pair(doctorIndex, patientIndex));
+        int doctorIndex = selectedDepartmentIndex.first().row();
+        _departmentIndexesRelation.insert(std::make_pair(doctorIndex, patientIndex));
     }
 
     /** На основе сохраненных индексов, берем значения по индексам и создаем пары отношений.
      *  Необходимо для сохранения связей в файл.
      */
-    for (auto const &item : _doctorIndexesRelation)
+    for (auto const &item : _departmentIndexesRelation)
     {
-        _doctorRelation.insert(std::make_pair(_qDoctors.at(item.first),
-                                              _qPatients.at(item.second)));
+        _departmentRelation.insert(std::make_pair(_qDepartments.at(item.first),
+                                              _qMedicines.at(item.second)));
     }
 
-    createDoctorRelation();
-    createPatientRelation();
+    createDepartmentRelation();
+    createMedicinesRelation();
 }
 
-void MainWindow::createDoctorRelation()
+void MainWindow::createDepartmentRelation()
 {
 
-    // Создаем дерево отношений для докторов.
+    // Создаем дерево отношений для отделов.
 
     // Создаем базовый topLevelItem для построения дерева отношений.
-    QTreeWidgetItem *doctor = new QTreeWidgetItem(ui->treeWidgetDoctors);
+    QTreeWidgetItem *department = new QTreeWidgetItem(ui->treeWidgetDepartment);
     // Присвоим на предыдущий элемент начало контейнера set через итератор.
-    Doctor *prevD = _doctorRelation.begin()->first;
+    Department *prevD = _departmentRelation.begin()->first;
 
     // Перебираем все связи  доктор -> пациенты
-    for(auto const &relation : _doctorRelation)
+    for(auto const &relation : _departmentRelation)
     {
         // Записываем следующее в списке имя доктора и пациента.
         // Извлекаем значения из контейнера pair first - доктор, second - пациент
@@ -141,46 +152,46 @@ void MainWindow::createDoctorRelation()
 
         // Для будущего формирования дерева, заполняем список.
         // Формируем множество для отношения пациент -> доктора
-        _patientRelation.insert(std::make_pair(p, d));
+        _medicinesRelation.insert(std::make_pair(p, d));
 
         // Когда сменяется доктор, то создаем новый topLevelItem
         // Для этого проверяем на равенство предыдущий и текущий элемент списка
         if (d != prevD)
         {
-            doctor = new QTreeWidgetItem(ui->treeWidgetDoctors);
+            department = new QTreeWidgetItem(ui->treeWidgetDepartment);
         }
         // добавляем в topLevelItem информацию о докторе
-        doctor->setText(0, d->getInfo().c_str());
-        ui->treeWidgetDoctors->addTopLevelItem(doctor);
+        department->setText(0, d->getInfo().c_str());
+        ui->treeWidgetDepartment->addTopLevelItem(department);
 
-        // Создаем объект child для пациента и добавляем его в topLevelItem
+        // Создаем объект child для препаратов и добавляем его в topLevelItem
         // таким образом формируется дерево отношений
         QTreeWidgetItem *patient = new QTreeWidgetItem();
         // В первую колонку вставляем пустую строку.
         patient->setText(0, "");
-        // Во вторую информацию о пациете.
+        // Во вторую информацию о препаратах.
         patient->setText(1, p->getInfo().c_str());
-        // Привязываем пациента к доктору.
-        doctor->addChild(patient);
+        // Привязываем препараты к отделению.
+        department->addChild(patient);
 
         prevD = d;
     }
 
 }
 
-void MainWindow::createPatientRelation()
+void MainWindow::createMedicinesRelation()
 {
     // -------------------------------------------------------------------------
     // Создаем обратное дерево отношений для пациентов.
 
     // Создаем базовый topLevelItem
-    QTreeWidgetItem *patient = new QTreeWidgetItem(ui->treeWidgetPatients);
+    QTreeWidgetItem *medicines = new QTreeWidgetItem(ui->treeWidgetMedication);
 
     // Присвоим на предыдущий элемент начало контейнера set через итератор.
-    Patient *prevP = _doctorRelation.begin()->second;
+    Medicines *prevM = _departmentRelation.begin()->second;
 
     // Перебираем все связи  доктор -> пациенты
-    for(auto const &relation : _patientRelation)
+    for(auto const &relation : _medicinesRelation)
     {
         // Записываем следующее в списке имя доктора и пациента.
         auto p = relation.first;
@@ -188,13 +199,13 @@ void MainWindow::createPatientRelation()
 
         // Когда сменяется доктор, то создаем новый topLevelItem
         // Для этого проверяем на равенство предыдущий и текущий элемент списка
-        if (p != prevP)
+        if (p != prevM)
         {
-            patient = new QTreeWidgetItem(ui->treeWidgetPatients);
+            medicines = new QTreeWidgetItem(ui->treeWidgetMedication);
         }
         // добавляем в topLevelItem информацию о пациенте.
-        patient->setText(0, p->getInfo().c_str());
-        ui->treeWidgetDoctors->addTopLevelItem(patient);
+        medicines->setText(0, p->getInfo().c_str());
+        ui->treeWidgetDepartment->addTopLevelItem(medicines);
 
         // Создаем объект child для доктора и добавляем его в topLevelItem
         // таким образом формируется дерево отношений
@@ -204,26 +215,17 @@ void MainWindow::createPatientRelation()
         // Во вторую информацию о докторе.
         doctor->setText(1, d->getInfo().c_str());
         // Привязываем докторов к пациентам.
-        patient->addChild(doctor);
+        medicines->addChild(doctor);
 
-        prevP = p;
+        prevM = p;
     }
-}
-
-// Обработчик добавления отношений.
-void MainWindow::on_pushButtonCreateDoctorRelation_clicked()
-{
-    addLink();
-    // Очищаем выбранные элементы списка.
-    ui->listViewDoctors->clearSelection();
-    ui->listViewPatients->clearSelection();
 }
 
 // Метод сохранения контента в файл.
 int MainWindow::saveContent(const QString &path)
 {
     // Проверка на пустоту списков.
-    if (_qDoctors.size() == 0 || _qPatients.size() == 0)
+    if (_qDepartments.size() == 0 || _qMedicines.size() == 0)
     {
         qDebug() << "Lists are empty!";
         return EXIT_FAILURE;
@@ -240,20 +242,20 @@ int MainWindow::saveContent(const QString &path)
     }
 
     // Формируем сохранения в некоторое подобие конфигурационного файла.
-    file << DOCTOR_SECTION << std::endl;
-    for (const auto &doctor : _qDoctors)
+    file << DEPARTMENT_SECTION << std::endl;
+    for (const auto &doctor : _qDepartments)
     {
         file << doctor->getInfo() << std::endl;
     }
 
-    file << PATIENT_SECTION << std::endl;
-    for (const auto &patient : _qPatients)
+    file << MEDICINES_SECTION << std::endl;
+    for (const auto &patient : _qMedicines)
     {
         file << patient->getInfo() << std::endl;
     }
 
     file << RELATIONS_SECTION << std::endl;
-    for (const auto &item : _doctorIndexesRelation)
+    for (const auto &item : _departmentIndexesRelation)
     {
         file << item.first << ':' << item.second << std::endl;
     }
@@ -279,40 +281,39 @@ int MainWindow::loadContent(const QString &path)
 
     std::string line;
 
-    std::string initials;
-    std::string roomNumber;
-    std::string specialization;
-    std::string age;
-    std::string gender;
+    std::string departmentName;
+    std::string staffCount;
+    std::string medicinesName;
+    std::string expireDate;
+    std::string price;
 
     // Читаем файл до конца.
     // Разбор самым простым образом, находим секцию и читаем до следующей найденной
     // Разбор учитывает порядок, сохраненный файл изменять нельзя.
     getline(file, line);
-    // Если встретили секцию с докторами, то создаем объекты и помещаем в список
+    // Если встретили секцию с отделами, то создаем объекты и помещаем в список
     // Пока не дошли до следующей секции.
-    if (DOCTOR_SECTION == line)
+    if (DEPARTMENT_SECTION == line)
     {
         while (true)
         {
             getline(file, line);
 
-            if (line == PATIENT_SECTION)
+            if (line == MEDICINES_SECTION)
                 break;
 
             std::istringstream iss(line);
             // Раскладываем прочитанную строку на поля.
-            getline(iss, specialization, ';');
-            getline(iss, initials, ';');
-            getline(iss, roomNumber, ';');
+            getline(iss, departmentName, ';');
+            getline(iss, staffCount, ';');
             // Создаем новый объект
-            Doctor *doctor = new Doctor(specialization, initials, std::stoul(roomNumber));
+            Department *department = new Department(departmentName, std::stoul(staffCount));
 
             // Кладем созданный объект в вектор.
-            _qDoctors.push_back(doctor);
+            _qDepartments.push_back(department);
         }
     }
-    if (PATIENT_SECTION == line)
+    if (MEDICINES_SECTION == line)
     {
         while (true)
         {
@@ -322,14 +323,16 @@ int MainWindow::loadContent(const QString &path)
 
             std::istringstream iss(line);
             // Раскладываем прочитанную строку на поля.
-            getline(iss, initials, ';');
-            getline(iss, age, ';');
-            getline(iss, gender, ';');
+            getline(iss, medicinesName, ';');
+            getline(iss, price, ';');
+            getline(iss, expireDate, ';');
             // Создаем новый объект
-            Patient *patient = new Patient(gender, initials, std::stoul(age));
+            Medicines *medicines = new Medicines(medicinesName,
+                                               std::stod(price),
+                                               std::stoul(expireDate));
 
             // Кладем созданный объект в вектор.
-            _qPatients.push_back(patient);
+            _qMedicines.push_back(medicines);
         }
     }
     if (line == RELATIONS_SECTION)
@@ -345,7 +348,7 @@ int MainWindow::loadContent(const QString &path)
 
             getline(iss, d, ':');
             getline(iss, p, ':');
-            _doctorIndexesRelation.insert(std::make_pair(std::stoi(d), std::stoi(p)));
+            _departmentIndexesRelation.insert(std::make_pair(std::stoi(d), std::stoi(p)));
         }
     }
 
@@ -379,14 +382,14 @@ void MainWindow::on_actionOpen_triggered()
         return;
 
     // Clear old data
-    _qDoctors.clear();
-    _qPatients.clear();
-    _doctorIndexesRelation.clear();
-    _doctorRelation.clear();
-    _patientRelation.clear();
+    _qDepartments.clear();
+    _qMedicines.clear();
+    _departmentIndexesRelation.clear();
+    _departmentRelation.clear();
+    _medicinesRelation.clear();
 
-    ui->treeWidgetDoctors->clear();
-    ui->treeWidgetPatients->clear();
+    ui->treeWidgetDepartment->clear();
+    ui->treeWidgetMedication->clear();
 
     loadContent(filename);
 
@@ -394,69 +397,43 @@ void MainWindow::on_actionOpen_triggered()
     QStringList *lines = new QStringList();
     QStringListModel *model = new QStringListModel(*lines, nullptr);
     // Заполняем контрол.
-    for(auto const &doctor : _qDoctors)
+    for(auto const &item : _qDepartments)
     {
-        lines->append(QString::fromStdString(doctor->getInfo()));
+        lines->append(QString::fromStdString(item->getInfo()));
     }
     model->setStringList(*lines);
-    ui->listViewDoctors->setModel(model);
+    ui->listViewDepartment->setModel(model);
 
     lines->clear();
     model = new QStringListModel(*lines, nullptr);
     // Заполняем контрол.
-    for(auto const &patient : _qPatients)
+    for(auto const &patient : _qMedicines)
     {
         lines->append(QString::fromStdString(patient->getInfo()));
     }
     model->setStringList(*lines);
-    ui->listViewPatients->setModel(model);
+    ui->listViewMedication->setModel(model);
 
-    if (!_doctorIndexesRelation.empty())
+    if (!_departmentIndexesRelation.empty())
     {
         /** На основе сохраненных индексов, берем значения по индексам и создаем пары отношений.
          *  Необходимо для сохранения/чтения связей.
          */
-        for (auto const &item : _doctorIndexesRelation)
+        for (auto const &item : _departmentIndexesRelation)
         {
-            _doctorRelation.insert(std::make_pair(_qDoctors.at(item.first),
-                                                  _qPatients.at(item.second)));
+            _departmentRelation.insert(std::make_pair(_qDepartments.at(item.first),
+                                                  _qMedicines.at(item.second)));
         }
-        createDoctorRelation();
+        createDepartmentRelation();
     }
-    createPatientRelation();
+    createMedicinesRelation();
 }
 
-// Обработчик удаления докторов.
-void MainWindow::on_pushButtonDeleteDoctor_clicked()
+// Обработчик удаления препаратов.
+void MainWindow::on_pushButtonDeleteMedication_clicked()
 {
     // Проверяем на наличие модели если указатеь на nullptr, значит список пуст.
-    auto modelDoctors = ui->listViewDoctors->selectionModel();
-    if (modelDoctors == nullptr)
-    {
-        qDebug() << "[ ERROR ] tree view is empty!";
-        return;
-    }
-
-    auto selectedDoctorIndex = modelDoctors->selectedIndexes();
-    int doctorIndex = selectedDoctorIndex.first().row();
-
-    // Удаляем сначала из списка докторов.
-    _qDoctors.erase(_qDoctors.begin() + doctorIndex);
-
-    modelDoctors->model()->removeRow(doctorIndex);
-    _doctorRelation.clear();
-    _patientRelation.clear();
-    ui->treeWidgetDoctors->clear();
-    ui->treeWidgetPatients->clear();
-    // Clear old data
-    _doctorIndexesRelation.clear();
-}
-
-// Обработчик удаления пациентов.
-void MainWindow::on_pushButtonDeletePatient_clicked()
-{
-    // Проверяем на наличие модели если указатеь на nullptr, значит список пуст.
-    auto modelPatients = ui->listViewPatients->selectionModel();
+    auto modelPatients = ui->listViewMedication->selectionModel();
     if (modelPatients == nullptr)
     {
         qDebug() << "[ ERROR ] tree view is empty!";
@@ -467,17 +444,52 @@ void MainWindow::on_pushButtonDeletePatient_clicked()
     auto selectedPatientIndex = modelPatients->selectedIndexes();
     int patientIndex = selectedPatientIndex.first().row();
 
-    // Удаляем сначала из списка пациентов.
-    _qPatients.erase(_qPatients.begin() + patientIndex);
+    // Удаляем сначала из списка препараты.
+    _qMedicines.erase(_qMedicines.begin() + patientIndex);
 
     // Очищаем модель
     modelPatients->model()->removeRow(patientIndex);
     // Очищаем связи
-    _doctorRelation.clear();
-    _patientRelation.clear();
+    _departmentRelation.clear();
+    _medicinesRelation.clear();
     // Очищаем контролы
-    ui->treeWidgetDoctors->clear();
-    ui->treeWidgetPatients->clear();
+    ui->treeWidgetDepartment->clear();
+    ui->treeWidgetMedication->clear();
     // Clear old data
-    _doctorIndexesRelation.clear();
+    _departmentIndexesRelation.clear();
+}
+
+// Обработчик удаления отделов.
+void MainWindow::on_pushButtonDeleteDepartment_clicked()
+{
+    // Проверяем на наличие модели если указатеь на nullptr, значит список пуст.
+    auto modelDoctors = ui->listViewDepartment->selectionModel();
+    if (modelDoctors == nullptr)
+    {
+        qDebug() << "[ ERROR ] tree view is empty!";
+        return;
+    }
+
+    auto selectedDoctorIndex = modelDoctors->selectedIndexes();
+    int doctorIndex = selectedDoctorIndex.first().row();
+
+    // Удаляем сначала из списка отделы.
+    _qDepartments.erase(_qDepartments.begin() + doctorIndex);
+
+    modelDoctors->model()->removeRow(doctorIndex);
+    _departmentRelation.clear();
+    _medicinesRelation.clear();
+    ui->treeWidgetDepartment->clear();
+    ui->treeWidgetMedication->clear();
+    // Clear old data
+    _departmentIndexesRelation.clear();
+}
+
+
+void MainWindow::on_actioncreate_triggered()
+{
+    addLink();
+    // Очищаем выбранные элементы списка.
+    ui->listViewDepartment->clearSelection();
+    ui->listViewMedication->clearSelection();
 }

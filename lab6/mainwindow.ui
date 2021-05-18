@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>851</width>
-    <height>601</height>
+    <height>623</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,16 +20,16 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QPushButton" name="pushButtonDeleteDoctor">
+         <widget class="QPushButton" name="pushButtonDeleteDepartment">
           <property name="text">
-           <string>Delete a doctor</string>
+           <string>Delete</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonAddDoctor">
+         <widget class="QPushButton" name="pushButtonAddDepartment">
           <property name="text">
-           <string>Add a doctor</string>
+           <string>Add</string>
           </property>
          </widget>
         </item>
@@ -40,51 +40,33 @@
             <item>
              <widget class="QLabel" name="label">
               <property name="text">
-               <string>Specialization:</string>
+               <string>Name:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditSpecialization">
+             <widget class="QLineEdit" name="lineEditDepartmentName">
               <property name="text">
-               <string>surgeon</string>
+               <string>Department №32</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Initials:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditInitialsDoctor">
-              <property name="text">
-               <string>Jack Willson</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <layout class="QHBoxLayout" name="horizontalLayout_2"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Room number:</string>
+               <string>Staff count:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBoxRoomNumber">
+             <widget class="QSpinBox" name="spinBoxStaffCount">
               <property name="minimum">
                <number>1</number>
               </property>
@@ -105,7 +87,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Doctors:</string>
+           <string>Department:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -113,16 +95,16 @@
          </widget>
         </item>
         <item>
-         <widget class="QListView" name="listViewDoctors">
+         <widget class="QListView" name="listViewDepartment">
           <property name="selectionMode">
            <enum>QAbstractItemView::SingleSelection</enum>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QTreeWidget" name="treeWidgetDoctors">
+         <widget class="QTreeWidget" name="treeWidgetDepartment">
           <attribute name="headerVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <attribute name="headerDefaultSectionSize">
            <number>100</number>
@@ -132,7 +114,7 @@
           </attribute>
           <column>
            <property name="text">
-            <string>Doctor</string>
+            <string>Department</string>
            </property>
            <property name="textAlignment">
             <set>AlignLeading|AlignTop</set>
@@ -140,7 +122,7 @@
           </column>
           <column>
            <property name="text">
-            <string>Patients</string>
+            <string>Medications</string>
            </property>
           </column>
          </widget>
@@ -150,27 +132,20 @@
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButtonCreateDoctorRelation">
-      <property name="text">
-       <string>Create a link</string>
-      </property>
-     </widget>
-    </item>
-    <item>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QPushButton" name="pushButtonDeletePatient">
+         <widget class="QPushButton" name="pushButtonDeleteMedication">
           <property name="text">
-           <string>Delete a patient</string>
+           <string>Delete</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonAddPatient">
+         <widget class="QPushButton" name="pushButtonAddMedication">
           <property name="text">
-           <string>Add a patient</string>
+           <string>Add</string>
           </property>
          </widget>
         </item>
@@ -181,14 +156,14 @@
             <item>
              <widget class="QLabel" name="label_4">
               <property name="text">
-               <string>Gender:</string>
+               <string>Name:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditGender">
+             <widget class="QLineEdit" name="lineEditMedicationName">
               <property name="text">
-               <string>women</string>
+               <string>painkiller</string>
               </property>
              </widget>
             </item>
@@ -199,17 +174,17 @@
             <item>
              <widget class="QLabel" name="label_5">
               <property name="text">
-               <string>Initials:</string>
+               <string>Price:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditInitialsPatient">
-              <property name="text">
-               <string>Kate Stafford</string>
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxPrice">
+              <property name="maximum">
+               <double>99999.990000000005239</double>
               </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              <property name="value">
+               <double>0.100000000000000</double>
               </property>
              </widget>
             </item>
@@ -220,12 +195,12 @@
             <item>
              <widget class="QLabel" name="label_6">
               <property name="text">
-               <string>Age:</string>
+               <string>Expiration date(months):</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBoxAge">
+             <widget class="QSpinBox" name="spinBoxExpireDate">
               <property name="minimum">
                <number>1</number>
               </property>
@@ -246,7 +221,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Patients:</string>
+           <string>Medication:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -256,25 +231,25 @@
        </layout>
       </item>
       <item>
-       <widget class="QListView" name="listViewPatients">
+       <widget class="QListView" name="listViewMedication">
         <property name="selectionMode">
          <enum>QAbstractItemView::MultiSelection</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QTreeWidget" name="treeWidgetPatients">
+       <widget class="QTreeWidget" name="treeWidgetMedication">
         <attribute name="headerDefaultSectionSize">
          <number>100</number>
         </attribute>
         <column>
          <property name="text">
-          <string notr="true">Patient</string>
+          <string notr="true">Medication</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Doctors</string>
+          <string>Departments</string>
          </property>
         </column>
        </widget>
@@ -289,7 +264,7 @@
      <x>0</x>
      <y>0</y>
      <width>851</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -299,7 +274,14 @@
     <addaction name="actionSave"/>
     <addaction name="actionOpen"/>
    </widget>
+   <widget class="QMenu" name="menuCreateLink">
+    <property name="title">
+     <string>CreateLink</string>
+    </property>
+    <addaction name="actioncreate"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuCreateLink"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave">
@@ -310,6 +292,11 @@
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
+   </property>
+  </action>
+  <action name="actioncreate">
+   <property name="text">
+    <string>create</string>
    </property>
   </action>
  </widget>
