@@ -1,9 +1,6 @@
 #include "universities.hpp"
+#include <QFile>
 #include <algorithm>
-
-#include <filesystem>
-
-using namespace::std::filesystem;
 
 
 /**
@@ -82,7 +79,7 @@ std::string Universities::showUniversities()
     for (size_t i = 0; i < _universities.size(); ++i)
     {
         std::string anniversaryMsg = "";
-        auto u = _universities[i];
+//        auto u = _universities[i];
         // Проверяем, если празднует юбилей, то вызываем функцию расчета юбилея.
         if (_universities[i]->getAnniversary() != -1)
         {
@@ -282,7 +279,9 @@ int Universities::readFromFileBinary(const std::string &path)
     if (file.is_open())
     {
         size_t readedBytes = 0;
-        size_t fSize = file_size(path);
+
+        QFile qFile(QString::fromStdString(path));
+        size_t fSize = qFile.size();
         // Читаем файл, пока он не дошел до конца.
         do
         {
